@@ -164,22 +164,6 @@ drawCenteredImage(
 	50
 );
 
-
-
-if(won){
-
-ctx.fillStyle="gold";
-ctx.font="45px Arial";
-
-ctx.fillText(
-"TEMPLE UNLOCKED",
-canvas.width/2-220,
-80
-);
-
-}
-
-
 requestAnimationFrame(draw);
 
 }
@@ -238,18 +222,9 @@ let distance = Math.hypot(
 );
 
 
-if(distance < 10){
+if(distance < 5){
 
     won = true;
-
-    document.dispatchEvent(
-        new KeyboardEvent(
-            "keydown",
-            {
-                key:"W"
-            }
-        )
-    );
 
 }
 
