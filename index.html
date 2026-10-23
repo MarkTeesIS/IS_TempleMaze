@@ -238,11 +238,22 @@ let distance = Math.hypot(
 );
 
 
-if(distance < 1){
+if(distance < 10){
 
-    won=true;
+    won = true;
+
+    document.dispatchEvent(
+        new KeyboardEvent(
+            "keydown",
+            {
+                key:"W"
+            }
+        )
+    );
 
 }
+
+
 
 }
 
