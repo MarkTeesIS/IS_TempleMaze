@@ -245,14 +245,7 @@ if(distance < 5){
 
     won = true;
 
-    document.dispatchEvent(
-        new KeyboardEvent(
-            "keydown",
-            {
-                key:"W"
-            }
-        )
-    );
+    window.location.href = "?complete=true";
 
 }
 
