@@ -283,24 +283,49 @@ function reset(){
 // Controls
 // =====================
 
+// =====================
+// Controls
+// =====================
+
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+
 canvas.addEventListener(
 "pointerdown",
 e => {
 
+    let rect = canvas.getBoundingClientRect();
+
+    let touchX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    let touchY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+
     let distance = Math.hypot(
-        e.clientX - player.x,
-        e.clientY - player.y
+        touchX - player.x,
+        touchY - player.y
     );
 
 
-    if(distance < 80){
+    if(distance < 100){
 
         dragging = true;
+
+
+        // Keep the point where the user grabbed the mask
+
+        dragOffsetX = player.x - touchX;
+        dragOffsetY = player.y - touchY;
+
+
+        canvas.setPointerCapture(e.pointerId);
 
     }
 
 });
-    
+
+
+
 canvas.addEventListener(
 "pointermove",
 e => {
@@ -308,8 +333,16 @@ e => {
     if(!dragging || won) return;
 
 
-player.x = e.clientX;
-player.y = e.clientY;
+    let rect = canvas.getBoundingClientRect();
+
+
+    let touchX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    let touchY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+
+
+    player.x = touchX + dragOffsetX;
+    player.y = touchY + dragOffsetY;
 
 
     checkCollision();
@@ -320,9 +353,11 @@ player.y = e.clientY;
 
 canvas.addEventListener(
 "pointerup",
-()=>{
+e => {
 
     dragging = false;
+
+    canvas.releasePointerCapture(e.pointerId);
 
 });
 
