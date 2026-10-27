@@ -119,7 +119,10 @@ function getOffset(){
 // Maze position
 // =====================
 
-const cell = 100;
+const cell = Math.min(
+    BASE_WIDTH / (maze[0].length + 2),
+    BASE_HEIGHT / (maze.length + 2)
+);
 
 
 const mazeWidth = maze[0].length * cell;
