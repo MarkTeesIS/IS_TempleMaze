@@ -310,8 +310,15 @@ e => {
     if(!dragging || won) return;
 
 
-    player.x = e.clientX;
-    player.y = e.clientY;
+    let rect = canvas.getBoundingClientRect();
+
+
+    let scaleX = canvas.width / rect.width;
+    let scaleY = canvas.height / rect.height;
+
+
+    player.x = (e.clientX - rect.left) * scaleX;
+    player.y = (e.clientY - rect.top) * scaleY;
 
 
     checkCollision();
