@@ -50,20 +50,20 @@ canvas.height = window.innerHeight;
 
 const maze = [
 
-".#########.",
-".#.......#.",
-".####.##.#.",
-"##.#...#.##",
-"...#.###...",
-"##.#...####",
-".#.###.#.#.",
-".#.......#.",
-".#########."
+"###############.",
+"#......#......#",
+"###.#####.###.#",
+"#...#.....#...#",
+"#.#.#.#####.#.#",
+"#.#.#...#...#.#",
+"#.###.#.#.#####",
+"#.....#.#.....#",
+"###############"
 
 ];
 
 
-const cell = 70;
+const cell = 120;
 
 const mazeWidth = maze[0].length * cell;
 const mazeHeight = maze.length * cell;
@@ -76,10 +76,10 @@ const offsetY = (canvas.height - mazeHeight) / 2;
 
 let player = {
 
-x: offsetX + (0 * cell) + cell/2,
-y: offsetY + (4 * cell) + cell/2,
-width:40,
-height:50
+x: offsetX + (1 * cell) + cell/2,
+y: offsetY + (1 * cell) + cell/2,
+width:80,
+height:100
 
 };
 
@@ -94,8 +94,8 @@ y:player.y
 
 let finish = {
 
-x: offsetX + (10 * cell) + cell/2,
-y: offsetY + (4 * cell) + cell/2
+x: offsetX + (13 * cell) + cell/2,
+y: offsetY + (7 * cell) + cell/2
 
 };
 
@@ -153,8 +153,8 @@ drawCenteredImage(
     mummyImage,
     finish.x,
     finish.y,
-    	50,
-	40
+    	100,
+	80
 );
 
 
@@ -164,8 +164,8 @@ drawCenteredImage(
     maskImage,
     player.x,
     player.y,
-    	40,
-	50
+    	80,
+	100
 );
 
 requestAnimationFrame(draw);
