@@ -56,10 +56,10 @@ canvas.height = window.innerHeight;
 const maze = [
 
     "#####################",
-    "#......#......#.....#",
+    "#...................#",
     "###.#####.###.#.###.#",
     "#...#.....#...#.#...#",
-    "#.###.#####.#...#.###",
+    "#.###.#####.#...#.#.#",
     "#.......#...#.#.#...#",
     "#####################"
 
@@ -165,16 +165,6 @@ function draw(){
 
 
 
-    // Draw player
-
-    drawCenteredImage(
-        maskImage,
-        player.x,
-        player.y,
-        cell * 0.55,
-        cell * 0.65
-    );
-
     // Draw finish
 
     drawCenteredImage(
@@ -183,6 +173,18 @@ function draw(){
         finish.y,
         cell * 0.7,
         cell * 0.6
+    );
+
+
+
+    // Draw player
+
+    drawCenteredImage(
+        maskImage,
+        player.x,
+        player.y,
+        cell * 0.55,
+        cell * 0.65
     );
 
 
