@@ -6,6 +6,8 @@
 <style>
 html, body {
     margin: 0;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     touch-action: none;
     background: transparent;
@@ -13,6 +15,8 @@ html, body {
 
 canvas {
     display: block;
+    width: 100%;
+    height: 100%;
 }
 </style>
 
@@ -43,23 +47,21 @@ mummyImage.src = "images/mummy.png";
 // Canvas
 // =====================
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
 
 
 // =====================
 // Maze Layout
-// # = wall
-// . = path
 // =====================
 
 const maze = [
 
     "#####################",
-    "#...................#",
+    "#......#......#.....#",
     "###.#####.###.#.###.#",
     "#...#.....#...#.#...#",
-    "#.###.#####.#...#.#.#",
+    "#.###.#####.#...#.###",
     "#.......#...#.#.#...#",
     "#####################"
 
@@ -70,13 +72,11 @@ const maze = [
 // Maze Positioning
 // =====================
 
-let cell = Math.min(
-    window.innerWidth / (maze[0].length + 2),
-    window.innerHeight / (maze.length + 2)
-);
+const cell = 70;
 
 const mazeWidth = maze[0].length * cell;
 const mazeHeight = maze.length * cell;
+
 
 const offsetX = (canvas.width - mazeWidth) / 2;
 const offsetY = (canvas.height - mazeHeight) / 2;
@@ -91,7 +91,6 @@ let player = {
     x: offsetX + (1 * cell) + cell / 2,
     y: offsetY + (1 * cell) + cell / 2,
 
-    // Collision area
     width: cell * 0.45,
     height: cell * 0.55
 
@@ -106,6 +105,7 @@ let start = {
 };
 
 
+
 // =====================
 // Finish
 // =====================
@@ -118,6 +118,7 @@ let finish = {
 };
 
 
+
 // =====================
 // Game State
 // =====================
@@ -126,8 +127,9 @@ let dragging = false;
 let won = false;
 
 
+
 // =====================
-// Draw Game
+// Draw
 // =====================
 
 function draw(){
@@ -140,7 +142,7 @@ function draw(){
     );
 
 
-    // Draw maze walls
+    // Draw walls
 
     for(let y = 0; y < maze.length; y++){
 
@@ -165,7 +167,7 @@ function draw(){
 
 
 
-    // Draw finish
+    // Mummy
 
     drawCenteredImage(
         mummyImage,
@@ -177,7 +179,7 @@ function draw(){
 
 
 
-    // Draw player
+    // Mask
 
     drawCenteredImage(
         maskImage,
@@ -188,20 +190,21 @@ function draw(){
     );
 
 
-
     requestAnimationFrame(draw);
 
 }
 
 
+
 // =====================
-// Collision Detection
+// Collision
 // =====================
 
 function checkCollision(){
 
     let left = player.x - player.width / 2;
     let right = player.x + player.width / 2;
+
     let top = player.y - player.height / 2;
     let bottom = player.y + player.height / 2;
 
@@ -211,6 +214,7 @@ function checkCollision(){
 
     let startRow = Math.floor((top - offsetY) / cell);
     let endRow = Math.floor((bottom - offsetY) / cell);
+
 
 
     for(let y = startRow; y <= endRow; y++){
@@ -238,7 +242,8 @@ function checkCollision(){
     }
 
 
-    // Win condition
+
+    // Win
 
     let distance = Math.hypot(
         player.x - finish.x,
@@ -246,16 +251,17 @@ function checkCollision(){
     );
 
 
-if(distance < 20){
+    if(distance < 20 && !won){
 
-    won = true;
+        won = true;
 
-window.location.href =
-"https://markteesis.github.io/IS_TempleMaze/?complete=" + Date.now();
+        window.location.href =
+        "?complete=" + Date.now();
+
+    }
 
 }
 
-}
 
 
 // =====================
@@ -272,8 +278,9 @@ function reset(){
 }
 
 
+
 // =====================
-// Touch Controls
+// Controls
 // =====================
 
 canvas.addEventListener(
@@ -295,6 +302,7 @@ e => {
 });
 
 
+
 canvas.addEventListener(
 "pointermove",
 e => {
@@ -311,6 +319,7 @@ e => {
 });
 
 
+
 canvas.addEventListener(
 "pointerup",
 ()=>{
@@ -318,6 +327,7 @@ canvas.addEventListener(
     dragging = false;
 
 });
+
 
 
 // =====================
@@ -343,7 +353,6 @@ function drawCenteredImage(
 }
 
 
-// Start
 
 draw();
 
