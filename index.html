@@ -284,26 +284,6 @@ function reset(){
 // =====================
 
 canvas.addEventListener(
-"pointerdown",
-e => {
-
-    let distance = Math.hypot(
-        e.clientX - player.x,
-        e.clientY - player.y
-    );
-
-
-    if(distance < 80){
-
-        dragging = true;
-
-    }
-
-});
-
-
-
-canvas.addEventListener(
 "pointermove",
 e => {
 
