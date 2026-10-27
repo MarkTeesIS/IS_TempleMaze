@@ -279,52 +279,31 @@ function reset(){
 
 
 
-// =====================
-// Controls
-// =====================
+let dragging = false;
 
-// =====================
-// Controls
-// =====================
 
-let dragOffsetX = 0;
-let dragOffsetY = 0;
+function moveMask(x, y){
 
+    player.x = x;
+    player.y = y;
+
+    checkCollision();
+
+}
+
+
+// Pointer start
 
 canvas.addEventListener(
 "pointerdown",
 e => {
 
-    let rect = canvas.getBoundingClientRect();
-
-    let touchX = (e.clientX - rect.left) * (canvas.width / rect.width);
-    let touchY = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-
-    let distance = Math.hypot(
-        touchX - player.x,
-        touchY - player.y
-    );
-
-
-    if(distance < 100){
-
-        dragging = true;
-
-
-        // Keep the point where the user grabbed the mask
-
-        dragOffsetX = player.x - touchX;
-        dragOffsetY = player.y - touchY;
-
-
-        canvas.setPointerCapture(e.pointerId);
-
-    }
+    dragging = true;
 
 });
 
 
+// Pointer move
 
 canvas.addEventListener(
 "pointermove",
@@ -333,31 +312,66 @@ e => {
     if(!dragging || won) return;
 
 
-    let rect = canvas.getBoundingClientRect();
-
-
-    let touchX = (e.clientX - rect.left) * (canvas.width / rect.width);
-    let touchY = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-
-
-    player.x = touchX + dragOffsetX;
-    player.y = touchY + dragOffsetY;
-
-
-    checkCollision();
+    moveMask(
+        e.clientX,
+        e.clientY
+    );
 
 });
 
 
+// Pointer end
 
 canvas.addEventListener(
 "pointerup",
-e => {
+()=>{
 
     dragging = false;
 
-    canvas.releasePointerCapture(e.pointerId);
+});
+
+
+// Touch fallback
+
+canvas.addEventListener(
+"touchstart",
+e => {
+
+    dragging = true;
+
+}, 
+{passive:false}
+);
+
+
+canvas.addEventListener(
+"touchmove",
+e => {
+
+    if(!dragging || won) return;
+
+
+    e.preventDefault();
+
+
+    let touch = e.touches[0];
+
+
+    moveMask(
+        touch.clientX,
+        touch.clientY
+    );
+
+},
+{passive:false}
+);
+
+
+canvas.addEventListener(
+"touchend",
+()=>{
+
+    dragging = false;
 
 });
 
