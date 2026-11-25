@@ -218,31 +218,42 @@ function draw(){
 
 
 
-    // Walls
+// Walls
 
-    for(let y = 0; y < maze.length; y++){
+ctx.lineWidth = 3;
+ctx.strokeStyle = "#D4AF37"; // Gold
 
-        for(let x = 0; x < maze[y].length; x++){
+for(let y = 0; y < maze.length; y++){
 
+    for(let x = 0; x < maze[y].length; x++){
 
-            if(maze[y][x] == "#"){
+        if(maze[y][x] == "#"){
 
+            const wallX = offsetX + x * cell;
+            const wallY = offsetY + y * cell;
 
-                ctx.fillStyle="#333333";
+            // Black fill
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(
+                wallX,
+                wallY,
+                cell,
+                cell
+            );
 
-
-                ctx.fillRect(
-                    offsetX + x * cell,
-                    offsetY + y * cell,
-                    cell,
-                    cell
-                );
-
-            }
+            // Gold outline
+            ctx.strokeRect(
+                wallX,
+                wallY,
+                cell,
+                cell
+            );
 
         }
 
     }
+
+}
 
 
 
