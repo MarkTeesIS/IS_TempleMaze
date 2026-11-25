@@ -337,17 +337,13 @@ function checkCollision(){
     );
 
 
-    if(distance < 20 && !won){
+if(distance < 20 && !won){
 
+    won=true;
 
-        won=true;
+    window.location.href = "index2.html";
 
-
-        window.location.href =
-        "?complete="+Date.now();
-
-
-    }
+}
 
 
 }
