@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+html, body {
+
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    touch-action:none;
+    background:transparent;
+
+}
+
+
+canvas {
+
+    display:block;
+    width:100vw;
+    height:100vh;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<canvas id="game"></canvas>
+
+
+<script>
+
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+
+// =====================
+// Base resolution
+// =====================
+
+const BASE_WIDTH = 1920;
+const BASE_HEIGHT = 1080;
+
+
+canvas.width = BASE_WIDTH;
+canvas.height = BASE_HEIGHT;
+
+
+
+// =====================
+// Images
+// =====================
+
+let maskImage = new Image();
+maskImage.src = "images/reaper.png";
+
+
+let mummyImage = new Image();
+mummyImage.src = "images/mummy.png";
+
+
+
+// =====================
+// Maze
+// =====================
+
+const maze = [
+
+    "#####################",
+    "#......#......#.....#",
+    "###.#####.###.#.###.#",
+    "#...#.....#...#.#...#",
+    "#.###.#####.#...#.###",
+    "#.......#...#.#.#...#",
+    "#####################"
+
+];
+
+
+
+// =====================
+// Scaling
+// =====================
+
+function getScale(){
+
+    return Math.min(
+        canvas.clientWidth / BASE_WIDTH,
+        canvas.clientHeight / BASE_HEIGHT
+    );
+
+}
+
+
+function getOffset(){
+
+    let scale = getScale();
+
+    return {
+
+        x:(canvas.clientWidth - BASE_WIDTH * scale) / 2,
+        y:(canvas.clientHeight - BASE_HEIGHT * scale) / 2
+
+    };
+
+}
+
+
+
+// =====================
+// Maze position
+// =====================
+
+const cell = Math.min(
+    BASE_WIDTH / (maze[0].length + 2),
+    BASE_HEIGHT / (maze.length + 2)
+);
+
+
+const mazeWidth = maze[0].length * cell;
+const mazeHeight = maze.length * cell;
+
+
+const offsetX = (BASE_WIDTH - mazeWidth) / 2;
+const offsetY = (BASE_HEIGHT - mazeHeight) / 2;
+
+
+
+// =====================
+// Player
+// =====================
+
+let player = {
+
+    x: offsetX + cell + cell / 2,
+    y: offsetY + cell + cell / 2,
+
+    width: cell * 0.45,
+    height: cell * 0.55
+
+};
+
+
+let start = {
+
+    x:player.x,
+    y:player.y
+
+};
+
+
+
+
+// =====================
+// Finish
+// =====================
+
+let finish = {
+
+    x:offsetX + (19 * cell) + cell / 2,
+    y:offsetY + (5 * cell) + cell / 2
+
+};
+
+
+
+
+// =====================
+// State
+// =====================
+
+let dragging = false;
+let won = false;
+
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+
+
+// =====================
+// Draw
+// =====================
+
+function draw(){
+
+
+    ctx.setTransform(1,0,0,1,0,0);
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    let scale = getScale();
+    let visualOffset = getOffset();
+
+
+    ctx.setTransform(
+        scale,
+        0,
+        0,
+        scale,
+        visualOffset.x,
+        visualOffset.y
+    );
+
+
+
+// Walls
+
+ctx.lineWidth = 3;
+ctx.strokeStyle = "#D4AF37"; // Gold
+
+for(let y = 0; y < maze.length; y++){
+
+    for(let x = 0; x < maze[y].length; x++){
+
+        if(maze[y][x] == "#"){
+
+            const wallX = offsetX + x * cell;
+            const wallY = offsetY + y * cell;
+
+            // Black fill
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(
+                wallX,
+                wallY,
+                cell,
+                cell
+            );
+
+            // Gold outline
+            ctx.strokeRect(
+                wallX,
+                wallY,
+                cell,
+                cell
+            );
+
+        }
+
+    }
+
+}
+
+
+
+    // Mummy
+
+    drawCenteredImage(
+        mummyImage,
+        finish.x,
+        finish.y,
+        cell * 0.7,
+        cell * 0.6
+    );
+
+
+
+    // Mask
+
+    drawCenteredImage(
+        maskImage,
+        player.x,
+        player.y,
+        cell * 0.55,
+        cell * 0.65
+    );
+
+
+    requestAnimationFrame(draw);
+
+}
+
+
+
+
+// =====================
+// Collision
+// =====================
+
+function checkCollision(){
+
+
+    let left = player.x - player.width / 2;
+    let right = player.x + player.width / 2;
+
+    let top = player.y - player.height / 2;
+    let bottom = player.y + player.height / 2;
+
+
+
+    let startCol = Math.floor((left-offsetX)/cell);
+    let endCol = Math.floor((right-offsetX)/cell);
+
+    let startRow = Math.floor((top-offsetY)/cell);
+    let endRow = Math.floor((bottom-offsetY)/cell);
+
+
+
+    for(let y=startRow;y<=endRow;y++){
+
+        for(let x=startCol;x<=endCol;x++){
+
+
+            if(
+                maze[y] &&
+                maze[y][x]=="#"
+            ){
+
+                reset();
+                return;
+
+            }
+
+        }
+
+    }
+
+
+
+    let distance = Math.hypot(
+        player.x-finish.x,
+        player.y-finish.y
+    );
+
+
+    if(distance < 20 && !won){
+
+
+        won=true;
+
+
+        window.location.href =
+        "?complete="+Date.now();
+
+
+    }
+
+
+}
+
+
+
+// =====================
+// Reset
+// =====================
+
+function reset(){
+
+    player.x=start.x;
+    player.y=start.y;
+
+    dragging=false;
+
+}
+
+
+
+
+// =====================
+// Touch conversion
+// =====================
+
+function getTouchPosition(e){
+
+
+    let rect = canvas.getBoundingClientRect();
+
+    let scale = getScale();
+
+    let offset = getOffset();
+
+
+
+    return {
+
+        x:(e.clientX - rect.left - offset.x) / scale,
+        y:(e.clientY - rect.top - offset.y) / scale
+
+    };
+
+
+}
+
+
+
+
+// =====================
+// Controls
+// =====================
+
+
+canvas.addEventListener(
+"pointerdown",
+e=>{
+
+
+    let pos=getTouchPosition(e);
+
+
+    let distance=Math.hypot(
+        pos.x-player.x,
+        pos.y-player.y
+    );
+
+
+    if(distance < 100){
+
+
+        dragging=true;
+
+
+        dragOffsetX=player.x-pos.x;
+        dragOffsetY=player.y-pos.y;
+
+
+        canvas.setPointerCapture(
+            e.pointerId
+        );
+
+    }
+
+
+});
+
+
+
+
+canvas.addEventListener(
+"pointermove",
+e=>{
+
+
+    if(!dragging || won)
+    return;
+
+
+
+    let pos=getTouchPosition(e);
+
+
+    player.x=pos.x+dragOffsetX;
+    player.y=pos.y+dragOffsetY;
+
+
+    checkCollision();
+
+
+});
+
+
+
+
+canvas.addEventListener(
+"pointerup",
+()=>{
+
+    dragging=false;
+
+});
+
+
+
+
+
+// Touch fallback
+
+canvas.addEventListener(
+"touchstart",
+e=>{
+
+
+    let touch=e.touches[0];
+
+    let pos=getTouchPosition(touch);
+
+
+    let distance=Math.hypot(
+        pos.x-player.x,
+        pos.y-player.y
+    );
+
+
+    if(distance < 100){
+
+
+        dragging=true;
+
+
+        dragOffsetX=player.x-pos.x;
+        dragOffsetY=player.y-pos.y;
+
+    }
+
+
+},
+{passive:false}
+);
+
+
+
+canvas.addEventListener(
+"touchmove",
+e=>{
+
+
+    if(!dragging || won)
+    return;
+
+
+    e.preventDefault();
+
+
+    let touch=e.touches[0];
+
+    let pos=getTouchPosition(touch);
+
+
+    player.x=pos.x+dragOffsetX;
+    player.y=pos.y+dragOffsetY;
+
+
+    checkCollision();
+
+
+},
+{passive:false}
+);
+
+
+
+canvas.addEventListener(
+"touchend",
+()=>{
+
+    dragging=false;
+
+});
+
+
+
+
+// =====================
+// Image helper
+// =====================
+
+function drawCenteredImage(
+    image,
+    x,
+    y,
+    width,
+    height
+){
+
+    ctx.drawImage(
+        image,
+        x-width/2,
+        y-height/2,
+        width,
+        height
+    );
+
+}
+
+
+
+draw();
+
+
+</script>
+
+</body>
+</html>
